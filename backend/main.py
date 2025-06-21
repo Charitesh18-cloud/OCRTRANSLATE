@@ -7,23 +7,17 @@ import io
 from pdf2image import convert_from_bytes
 import requests
 import time
+import os  # ⬅️ For environment variables
 
 app = FastAPI(title="OCR + DeepTranslate API")
 
 # ---------- CORS Setup ----------
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all for development
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-# ---------- Supported Languages ----------
-# ISO-639-1 codes for Deep Translate and Tesseract:
-# English (eng, en), Hindi (hin, hi), Telugu (tel, te), Tamil (tam, ta),
-# Kannada (kan, kn), Malayalam (mal, ml), Bengali (ben, bn), Gujarati (guj, gu),
-# Marathi (mar, mr), Odia (ori, or), Punjabi (pan, pa), Sanskrit (san, sa),
-# Urdu (urd, ur), Arabic (ara, ar), Spanish (spa, es), French (fra, fr)
 
 # ---------- OCR Endpoint ----------
 @app.post("/ocr")
@@ -52,8 +46,8 @@ async def ocr(file: UploadFile, language: str = Form("eng")):
 # ---------- Translation Endpoint ----------
 class TranslateRequest(BaseModel):
     text: str
-    source_language: str  # ISO 639-1 like 'en', 'hi', 'ta'
-    target_language: str  # ISO 639-1 like 'te', 'ur', 'fr'
+    source_language: str
+    target_language: str
 
 class TranslateResponse(BaseModel):
     translated_text: str
@@ -69,7 +63,7 @@ def deep_translate(text, source_lang, target_lang):
     }
     headers = {
         "Content-Type": "application/json",
-        "X-RapidAPI-Key": "8bddf28b16msh6cf5fca5728d9dep1a29c2jsn38319fd2d2c2",  # ✅ Your API Key
+        "X-RapidAPI-Key": os.getenv("RAPIDAPI_KEY"),  # ⬅️ Key is now hidden!
         "X-RapidAPI-Host": "deep-translate1.p.rapidapi.com"
     }
 
